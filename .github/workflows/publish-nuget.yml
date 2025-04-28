@@ -1,0 +1,54 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          9.0.x
+          6.0.x
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build
+    
+    - name: Extract version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Pack ZAnalyzers.Core
+      run: dotnet pack src/ZAnalyzers.Core/ZAnalyzers.Core.csproj --configuration Release --no-build --output nuget-packages -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+    
+    - name: Pack ZAnalyzers.MinimalApiSG
+      run: dotnet pack src/ZAnalyzers.MinimalApiSG/ZAnalyzers.MinimalApiSG.csproj --configuration Release --no-build --output nuget-packages -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+    
+    - name: Push packages to NuGet
+      run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: nuget-packages/*.nupkg
+        name: Release ${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
