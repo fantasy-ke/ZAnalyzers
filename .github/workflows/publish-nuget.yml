@@ -40,7 +40,8 @@ jobs:
       run: dotnet pack src/ZAnalyzers.MinimalApiSG/ZAnalyzers.MinimalApiSG.csproj --configuration Release --no-build --output nuget-packages -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
     
     - name: Push packages to NuGet
-      run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: |
+        dotnet nuget push nuget-packages/*.nupkg  --skip-duplicate --source https://api.nuget.org/v3/index.json  --api-key ${{ secrets.NUGET_API_KEY }}
     
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
