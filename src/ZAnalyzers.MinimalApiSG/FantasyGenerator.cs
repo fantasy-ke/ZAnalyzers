@@ -466,7 +466,7 @@ namespace ZAnalyzers.MinimalApiSG
             var (httpMethod, route) = DetermineHttpMethodAndRoute(method);
 
             // 获取方法级别的属性，排除 FilterAttribute ZAuthorizeAttribute
-            var ignoreAttributes = new[] {"FilterAttribute", "AuthorizeAttribute", "AsyncStateMachineAttribute" };
+            var ignoreAttributes = new[] {"FilterAttribute", "AuthorizeAttribute", "AsyncStateMachineAttribute", "IgnoreAntiforgeryTokenAttribute" };
             var methodAttributes =
                 method.GetAttributes().Where(a => !ignoreAttributes.Any(v=> a.AttributeClass?.Name.EndsWith(v) ?? false)).ToList();
 
@@ -491,6 +491,15 @@ namespace ZAnalyzers.MinimalApiSG
                 }
             }
             
+            // 获取方法级别的过滤器
+            var ignoreAntiforgerys =
+                method.GetAttributes().Where(a => a.AttributeClass?.Name == "IgnoreAntiforgeryTokenAttribute").ToList();
+                
+            var ignoreAntExtensions = new StringBuilder();
+            if (ignoreAntiforgerys.Any())
+            {
+                ignoreAntExtensions.AppendLine($"\r\n.DisableAntiforgery()");
+            }
             // 获取方法级别的权限
             var zAuthExtensions = new StringBuilder();
             var zAuthorizeAttributes =
@@ -577,7 +586,7 @@ namespace ZAnalyzers.MinimalApiSG
 
             // 组合所有部分生成方法代码
             var methodCode = $@"            {instanceName}.Map{httpMethod}(""{route}"",{attributesString}
-                {lambda}){zAuthExtensions}{filterExtensions};";
+                {lambda}){zAuthExtensions}{ignoreAntExtensions}{filterExtensions};";
 
             return methodCode;
         }
