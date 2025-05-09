@@ -12,6 +12,10 @@ ZAnalyzers是一系列用于简化ASP.NET Core开发的代码生成器和分析�
 
 Minimal API的源代码生成器，用于自动生成API路由映射和依赖注入注册代码。通过继承`FantasyApi`基类和按照命名约定创建服务类，无需手动编写路由映射代码。
 
+### [ZAnalyzers.Test](./src/ZAnalyzers.Test/ZAnalyzers.Test/README.md)
+
+示例和测试项目，展示ZAnalyzers套件的各种功能和用法。包括自定义路由、授权、过滤器和API分组等功能演示。
+
 ## 快速入门
 
 1. 安装所需包：

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZAnalyzers.Core", "src\ZAnalyzers.Core\ZAnalyzers.Core.csproj", "{381DC492-3EE3-40F8-A6B5-9AA1F3846638}"
 EndProject
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZAnalyzers.Test", "src\ZAnalyzers.Test\ZAnalyzers.Test\ZAnalyzers.Test.csproj", "{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,8 +30,15 @@ Global
 		{45240821-98C3-4E43-8EFB-202F5D528733}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45240821-98C3-4E43-8EFB-202F5D528733}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45240821-98C3-4E43-8EFB-202F5D528733}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {93DA1005-30F3-4DB4-BF28-68B4938C885E}
 	EndGlobalSection
 EndGlobal
