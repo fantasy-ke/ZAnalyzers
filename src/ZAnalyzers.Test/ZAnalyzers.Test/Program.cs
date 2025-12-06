@@ -60,7 +60,8 @@ app.MapGet("/weatherforecast", () =>
         return forecast;
     })
     .WithName("GetWeatherForecast");
-app.MapFantasyApi();
+
+app.MapFantasyApis();
 
 app.Run();
 

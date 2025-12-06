@@ -1,4 +1,4 @@
-﻿namespace ZAnalyzers.Core.Attribute
+﻿namespace ZAnalyzers.Core
 {
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)] 
 	public class RouteAttribute(string route) : System.Attribute

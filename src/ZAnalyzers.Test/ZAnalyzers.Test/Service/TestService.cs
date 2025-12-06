@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZAnalyzers.Core;
-using ZAnalyzers.Core.Attribute;
 using ZAnalyzers.Test.Attr;
 using ZAnalyzers.Test.Filter;
 
@@ -19,9 +18,12 @@ public interface ITestService
     Task<string> FilterAsync();
 }
 
-[Core.Attribute.Route("api/Test")]
+[Core.Route("api/Test")]
 [Tags("Test")]
 [Filter(typeof(TestFilter))]
+[TestAuthorize("Test.Page", "Test.Update")]
+[Authorize("Test.Page")]
+[Authorize(Roles =  "Admin", Policy = "Test")]
 //[Authorize(Roles = "Admin")]
 public class TestService: FantasyApi,  ITestService
 {
@@ -35,7 +37,7 @@ public class TestService: FantasyApi,  ITestService
     /// 自定义权限特性
     /// </summary>
     /// <returns></returns>
-    [TestAuthorize("Test.Page", "Test.Update")]
+    [Authorize("Test.Page")]
     public async Task<string> UpdateAsync()
     {
         return await Task.FromResult("asd");
