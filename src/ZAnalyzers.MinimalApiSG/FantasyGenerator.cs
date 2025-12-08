@@ -487,10 +487,19 @@ namespace ZAnalyzers.MinimalApiSG
                 
                 foreach (var classInfo in group.OrderBy(c => c.ClassName))
                 {
-                    var fullTypeName = string.IsNullOrEmpty(classInfo.Namespace) 
+                    var fullTypeClassName = string.IsNullOrEmpty(classInfo.Namespace) 
                         ? classInfo.ClassName 
                         : $"{classInfo.Namespace}.{classInfo.ClassName}";
-                    sb.AppendLine($"                    services.AddSingleton<{fullTypeName}>();");
+                    if (string.IsNullOrWhiteSpace(classInfo.InterName))
+                    {
+                        sb.AppendLine($"                    services.AddSingleton<{fullTypeClassName}>();");
+                        continue;
+                    }
+                    var fullTypeInteName = string.IsNullOrEmpty(classInfo.InterName)
+                        ? classInfo.InterName
+                        : $"{classInfo.InterNamespace}.{classInfo.InterName}";
+
+                    sb.AppendLine($"                    services.AddSingleton<{fullTypeInteName}, {fullTypeClassName}>();");
                 }
             }
             sb.AppendLine("                    break;");
@@ -506,10 +515,19 @@ namespace ZAnalyzers.MinimalApiSG
                 
                 foreach (var classInfo in group.OrderBy(c => c.ClassName))
                 {
-                    var fullTypeName = string.IsNullOrEmpty(classInfo.Namespace) 
+                    var fullTypeClassName = string.IsNullOrEmpty(classInfo.Namespace) 
                         ? classInfo.ClassName 
                         : $"{classInfo.Namespace}.{classInfo.ClassName}";
-                    sb.AppendLine($"                    services.AddScoped<{fullTypeName}>();");
+                    if (string.IsNullOrWhiteSpace(classInfo.InterName))
+                    {
+                        sb.AppendLine($"                    services.AddScoped<{fullTypeClassName}>();");
+                        continue;
+                    }
+                    var fullTypeInteName = string.IsNullOrEmpty(classInfo.InterName)
+                        ? classInfo.InterName
+                        : $"{classInfo.InterNamespace}.{classInfo.InterName}";
+
+                    sb.AppendLine($"                    services.AddScoped<{fullTypeInteName}, {fullTypeClassName}>();");
                 }
             }
             sb.AppendLine("                    break;");
@@ -525,10 +543,19 @@ namespace ZAnalyzers.MinimalApiSG
                 
                 foreach (var classInfo in group.OrderBy(c => c.ClassName))
                 {
-                    var fullTypeName = string.IsNullOrEmpty(classInfo.Namespace) 
-                        ? classInfo.ClassName 
+                    var fullTypeClassName = string.IsNullOrEmpty(classInfo.Namespace)
+                        ? classInfo.ClassName
                         : $"{classInfo.Namespace}.{classInfo.ClassName}";
-                    sb.AppendLine($"                    services.AddTransient<{fullTypeName}>();");
+                    if (string.IsNullOrWhiteSpace(classInfo.InterName))
+                    {
+                        sb.AppendLine($"                    services.AddTransient<{fullTypeClassName}>();");
+                        continue;
+                    }
+                    var fullTypeInteName = string.IsNullOrEmpty(classInfo.InterName)
+                        ? classInfo.InterName
+                        : $"{classInfo.InterNamespace}.{classInfo.InterName}";
+
+                    sb.AppendLine($"                    services.AddTransient<{fullTypeInteName}, {fullTypeClassName}>();");
                 }
             }
             sb.AppendLine("                    break;");
