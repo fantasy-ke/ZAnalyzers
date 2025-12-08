@@ -495,11 +495,11 @@ namespace ZAnalyzers.MinimalApiSG
                         sb.AppendLine($"                    services.AddSingleton<{fullTypeClassName}>();");
                         continue;
                     }
-                    var fullTypeInteName = string.IsNullOrEmpty(classInfo.InterName)
+                    var fullTypeInterName = string.IsNullOrEmpty(classInfo.InterName)
                         ? classInfo.InterName
                         : $"{classInfo.InterNamespace}.{classInfo.InterName}";
 
-                    sb.AppendLine($"                    services.AddSingleton<{fullTypeInteName}, {fullTypeClassName}>();");
+                    sb.AppendLine($"                    services.AddSingleton<{fullTypeInterName}, {fullTypeClassName}>();");
                 }
             }
             sb.AppendLine("                    break;");
@@ -704,10 +704,14 @@ namespace ZAnalyzers.MinimalApiSG
             var serviceInstance = GenerateInstanceName(classInfo.ClassName);
 
             // 构建 Lambda 表达式
-            var fullTypeName = string.IsNullOrEmpty(classInfo.Namespace) 
-                ? classInfo.ClassName 
-                : $"{classInfo.Namespace}.{classInfo.ClassName}";
+            var fullTypeName = string.IsNullOrWhiteSpace(classInfo.InterName)
+                ? FormatQualifiedName(classInfo.Namespace, classInfo.ClassName)
+                : FormatQualifiedName(classInfo.InterNamespace, classInfo.InterName);
 
+            // 通用格式化方法
+            string FormatQualifiedName(string @namespace, string name) =>
+                string.IsNullOrEmpty(@namespace) ? name : $"{@namespace}.{name}";
+            
             string lambda;
             
             // 检查是否是 GET 请求且有复杂类型参数
