@@ -22,8 +22,6 @@ public interface ITestService
 [Tags("Test")]
 [Filter(typeof(TestFilter))]
 [TestAuthorize("Test.Page", "Test.Update")]
-[Authorize("Test.Page")]
-[Authorize(Roles =  "Admin", Policy = "Test")]
 //[Authorize(Roles = "Admin")]
 public class TestService: FantasyApi,  ITestService
 {

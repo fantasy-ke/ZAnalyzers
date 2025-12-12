@@ -16,6 +16,7 @@ namespace ZAnalyzers.MinimalApiSG
     public class FantasyGenerator : IIncrementalGenerator
     {
         private const string FantasyApiBaseTypeName = "FantasyApi";
+        private const string FantasyServiceBaseTypeName = "FantasyService";
         private const string ServiceSuffix = "Service";
         private const string AsyncSuffix = "Async";
         
@@ -160,6 +161,9 @@ namespace ZAnalyzers.MinimalApiSG
             var className = classSymbol.Name;
             var attributes = classSymbol.GetAttributes();
             
+            // 检查是否继承自 FantasyService（只生成服务注册）
+            var isServiceOnly = InheritsFromFantasyService(classSymbol);
+            
             // 获取公共非静态方法
             var methods = classSymbol.GetMembers()
                 .OfType<IMethodSymbol>()
@@ -208,8 +212,11 @@ namespace ZAnalyzers.MinimalApiSG
                 a.AttributeClass?.Name?.EndsWith("AuthorizeAttribute", StringComparison.OrdinalIgnoreCase) == true).ToList();
 
             // 获取继承的接口并匹配名称
-            var interfaces = classSymbol.AllInterfaces
-                .FirstOrDefault(i => i.Name.StartsWith("I") && i.Name.Substring(1) == className);
+            var interfaces = isServiceOnly 
+                ? classSymbol.AllInterfaces
+                    .FirstOrDefault(i => i.Name.StartsWith("I") && className.EndsWith(i.Name.Substring(1)))
+                :classSymbol.AllInterfaces
+                    .FirstOrDefault(i => i.Name.StartsWith("I") && i.Name.Substring(1) == className);
 
             var interFacesNamespace = GetFullNamespace(interfaces?.ContainingNamespace);
             
@@ -223,8 +230,22 @@ namespace ZAnalyzers.MinimalApiSG
                 Tags = tags,
                 FilterAttributes = filterAttributes,
                 AuthorizeAttributes = authorizeAttributes,
-                Methods = methods
+                Methods = methods,
+                IsServiceOnly = isServiceOnly
             };
+        }
+
+        private static bool InheritsFromFantasyService(INamedTypeSymbol typeSymbol)
+        {
+            var baseType = typeSymbol.BaseType;
+            while (baseType != null)
+            {
+                if (baseType.Name == FantasyServiceBaseTypeName)
+                    return true;
+                baseType = baseType.BaseType;
+            }
+
+            return false;
         }
 
         private static bool InheritsFromZAnalyzers(INamedTypeSymbol typeSymbol)
@@ -232,7 +253,7 @@ namespace ZAnalyzers.MinimalApiSG
             var baseType = typeSymbol.BaseType;
             while (baseType != null)
             {
-                if (baseType.Name == FantasyApiBaseTypeName)
+                if (baseType.Name == FantasyApiBaseTypeName || baseType.Name == FantasyServiceBaseTypeName)
                     return true;
                 baseType = baseType.BaseType;
             }
@@ -275,10 +296,13 @@ namespace ZAnalyzers.MinimalApiSG
             // 生成主扩展文件（包含 DI 注册和总的映射方法）
             GenerateMainExtensionsFile(context, classInfos);
 
-            // 为每个类生成单独的扩展文件
+            // 为每个类生成单独的扩展文件（只对非ServiceOnly类生成HTTP端点映射）
             foreach (var classInfo in classInfos)
             {
-                GenerateIndividualExtensionFile(context, classInfo, compilation, context.CancellationToken);
+                if (!classInfo.IsServiceOnly)
+                {
+                    GenerateIndividualExtensionFile(context, classInfo, compilation, context.CancellationToken);
+                }
             }
         }
 
@@ -338,7 +362,7 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("            var options = new ZAnalyzers.Core.FantasyOption();");
             sourceBuilder.AppendLine("            configureOptions?.Invoke(options);");
             sourceBuilder.AppendLine();
-            foreach (var classInfo in classInfos.OrderBy(c => c.Namespace).ThenBy(c => c.ClassName))
+            foreach (var classInfo in classInfos.Where(c => !c.IsServiceOnly).OrderBy(c => c.Namespace).ThenBy(c => c.ClassName))
             {
                 var methodName = GenerateMapMethodName(classInfo.ClassName);
                 sourceBuilder.AppendLine($"            webApplication.Map{methodName}(options);");
@@ -1107,6 +1131,7 @@ namespace ZAnalyzers.MinimalApiSG
             public List<AttributeData> AuthorizeAttributes { get; set; } = new();
             public List<AttributeData> FilterAttributes { get; set; } = new();
             public List<IMethodSymbol> Methods { get; set; } = new();
+            public bool IsServiceOnly { get; set; }
         }
     }
 }
