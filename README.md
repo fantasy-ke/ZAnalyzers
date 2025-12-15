@@ -12,6 +12,10 @@ ZAnalyzers是一系列用于简化ASP.NET Core开发的代码生成器和分析�
 
 Minimal API的源代码生成器，用于自动生成API路由映射和依赖注入注册代码。通过继承`FantasyApi`基类和按照命名约定创建服务类，无需手动编写路由映射代码。
 
+### [ZAnalyzers.ServiceInjectionSG](./src/ZAnalyzers.ServiceInjectionSG/README.md)
+
+服务注入源生成器，用于自动扫描并注册实现了特定依赖注入接口的服务。支持Scoped、Singleton和Transient三种生命周期的服务自动注册。
+
 ### [ZAnalyzers.Test](./src/ZAnalyzers.Test/ZAnalyzers.Test/README.md)
 
 示例和测试项目，展示ZAnalyzers套件的各种功能和用法。包括自定义路由、授权、过滤器和API分组等功能演示。
@@ -23,6 +27,7 @@ Minimal API的源代码生成器，用于自动生成API路由映射和依赖注
 ```bash
 dotnet add package ZAnalyzers.Core
 dotnet add package ZAnalyzers.MinimalApiSG
+dotnet add package ZAnalyzers.ServiceInjectionSG
 ```
 
 2. 创建API服务类：
@@ -32,7 +37,7 @@ using ZAnalyzers.Core;
 
 namespace YourApp.Services
 {
-    public class ProductService : FantasyApi
+    public class ProductService : ZAnalyzerApi
     {
         public async Task<List<Product>> GetProducts()
         {
@@ -55,12 +60,14 @@ namespace YourApp.Services
 var builder = WebApplication.CreateBuilder(args);
 
 // 注册服务
-builder.Services.WithFantasyLife();
+builder.Services.AddZAnalyzerServices();
+// 添加ZMinimal生命周期
+builder.Services.WithZMinmalLife();
 
 var app = builder.Build();
 
 // 映射API路由
-app.MapFantasyApi();
+app.MapZMinimalApis();
 
 app.Run();
 ```
