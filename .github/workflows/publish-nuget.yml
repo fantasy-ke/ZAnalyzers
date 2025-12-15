@@ -38,6 +38,10 @@ jobs:
     
     - name: Pack ZAnalyzers.MinimalApiSG
       run: dotnet pack src/ZAnalyzers.MinimalApiSG/ZAnalyzers.MinimalApiSG.csproj --configuration Release --no-build --output nuget-packages -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+
+    - name: Pack ZAnalyzers.ServiceInjectionSG
+      run: dotnet pack src/ZAnalyzers.ServiceInjectionSG/ZAnalyzers.ServiceInjectionSG.csproj --configuration Release --no-build --output nuget-packages -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+    
     
     - name: Push packages to NuGet
       run: |

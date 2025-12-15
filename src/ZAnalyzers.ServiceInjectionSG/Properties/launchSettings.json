@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "ZAnalyzers.ServiceInjectionSG": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\ZAnalyzers.Test\\ZAnalyzers.Test\\ZAnalyzers.Test.csproj"
+    }
+  }
+}

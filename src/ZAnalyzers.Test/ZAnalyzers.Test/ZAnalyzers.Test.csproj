@@ -11,10 +11,11 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
         <PackageReference Include="Scalar.AspNetCore" Version="2.2.7" />
     </ItemGroup>
-
+    
     <ItemGroup>
-      <ProjectReference Include="..\..\ZAnalyzers.Core\ZAnalyzers.Core.csproj" />
-      <ProjectReference Include="..\..\ZAnalyzers.MinimalApiSG\ZAnalyzers.MinimalApiSG.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\ZAnalyzers.Core\ZAnalyzers.Core.csproj" />
+        <ProjectReference Include="..\..\ZAnalyzers.MinimalApiSG\ZAnalyzers.MinimalApiSG.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\ZAnalyzers.ServiceInjectionSG\ZAnalyzers.ServiceInjectionSG.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

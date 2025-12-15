@@ -1,6 +1,6 @@
 ﻿namespace ZAnalyzers.Core
 {
-	public class FantasyOption
+	public class ZAnalyzerOption
 	{
 		public bool? DisableAutoMapRoute { get; set; }
 

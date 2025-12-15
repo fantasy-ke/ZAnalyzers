@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35931.197
@@ -7,11 +6,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZAnalyzers.Core", "src\ZAna
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZAnalyzers.MinimalApiSG", "src\ZAnalyzers.MinimalApiSG\ZAnalyzers.MinimalApiSG.csproj", "{45240821-98C3-4E43-8EFB-202F5D528733}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZAnalyzers.ServiceInjectionSG", "src\ZAnalyzers.ServiceInjectionSG\ZAnalyzers.ServiceInjectionSG.csproj", "{5A1F3F8D-2D8C-4A83-9D3E-6B2D1A7B1C2E}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{23299B5F-DE32-4303-8A29-C06B070D72D2}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md
+		.github\workflows\publish-nuget.yml = .github\workflows\publish-nuget.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZAnalyzers.Test", "src\ZAnalyzers.Test\ZAnalyzers.Test\ZAnalyzers.Test.csproj", "{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}"
@@ -30,6 +32,10 @@ Global
 		{45240821-98C3-4E43-8EFB-202F5D528733}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45240821-98C3-4E43-8EFB-202F5D528733}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45240821-98C3-4E43-8EFB-202F5D528733}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A1F3F8D-2D8C-4A83-9D3E-6B2D1A7B1C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A1F3F8D-2D8C-4A83-9D3E-6B2D1A7B1C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A1F3F8D-2D8C-4A83-9D3E-6B2D1A7B1C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A1F3F8D-2D8C-4A83-9D3E-6B2D1A7B1C2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CBAB9D8-7E13-46E0-8D3E-A6FE233735D2}.Release|Any CPU.ActiveCfg = Release|Any CPU

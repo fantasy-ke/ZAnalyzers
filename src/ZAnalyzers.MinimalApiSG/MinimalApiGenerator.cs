@@ -13,30 +13,25 @@ using ZAnalyzers.MinimalApiSG.Extensions;
 namespace ZAnalyzers.MinimalApiSG
 {
     [Generator(LanguageNames.CSharp)]
-    public class FantasyGenerator : IIncrementalGenerator
+    public class MinimalApiGenerator : IIncrementalGenerator
     {
-        private const string FantasyApiBaseTypeName = "FantasyApi";
-        private const string FantasyServiceBaseTypeName = "FantasyService";
+        private const string ZAnalyzerApiBaseTypeName = "ZAnalyzerApi";
         private const string ServiceSuffix = "Service";
         private const string AsyncSuffix = "Async";
         
         // 常用的HTTP方法特性名称
-        private static readonly HashSet<string> HttpMethodAttributes = new()
-        {
-            "HttpGetAttribute", "HttpPostAttribute", "HttpPutAttribute", 
+        private static readonly HashSet<string> HttpMethodAttributes =
+        [
+            "HttpGetAttribute", "HttpPostAttribute", "HttpPutAttribute",
             "HttpDeleteAttribute", "HttpPatchAttribute", "HttpHeadAttribute", "HttpOptionsAttribute"
-        };
+        ];
         
         // 需要过滤的系统程序集前缀
-        private static readonly HashSet<string> SystemAssemblyPrefixes = new()
-        {
-            "System", "Microsoft.", "mscorlib", "netstandard", "runtime"
-        };
+        private static readonly HashSet<string> SystemAssemblyPrefixes =
+            ["System", "Microsoft.", "mscorlib", "netstandard", "runtime"];
         
-        private static readonly HashSet<string> FilterMethodAttributes = new()
-        {
-            "IgnoreAntiforgeryTokenAttribute", "AsyncStateMachineAttribute"
-        };
+        private static readonly HashSet<string> FilterMethodAttributes =
+            ["IgnoreAntiforgeryTokenAttribute", "AsyncStateMachineAttribute"];
         
         // MVC HTTP方法特性映射
         private static readonly Dictionary<string, string> MvcHttpMethodAttributes = new()
@@ -96,10 +91,7 @@ namespace ZAnalyzers.MinimalApiSG
                 return null;
 
             // 检查类是否继承自 ZAnalyzers.Core
-            if (!InheritsFromZAnalyzers(classSymbol))
-                return null;
-
-            return CreateClassInfo(classSymbol);
+            return !InheritsFromZAnalyzers(classSymbol) ? null : CreateClassInfo(classSymbol);
         }
 
         private ImmutableArray<ClassInfo> GetReferencedClasses(Compilation compilation)
@@ -142,12 +134,12 @@ namespace ZAnalyzers.MinimalApiSG
         private static AttributeData? FindAttribute(ImmutableArray<AttributeData> attributes, string attributeName)
         {
             // 优先查找 ZAnalyzers.Core 命名空间的特性
-            var fantasyServiceAttr = attributes.FirstOrDefault(a => 
+            var zAnalyzerServiceAttr = attributes.FirstOrDefault(a => 
                 a.AttributeClass?.Name == attributeName && 
                 a.AttributeClass?.ContainingNamespace?.ToDisplayString() == "ZAnalyzers.Core");
             
-            if (fantasyServiceAttr != null)
-                return fantasyServiceAttr;
+            if (zAnalyzerServiceAttr != null)
+                return zAnalyzerServiceAttr;
             
             // 回退到 Microsoft.AspNetCore.Mvc 命名空间
             return attributes.FirstOrDefault(a => 
@@ -160,9 +152,6 @@ namespace ZAnalyzers.MinimalApiSG
             var namespaceName = GetFullNamespace(classSymbol.ContainingNamespace);
             var className = classSymbol.Name;
             var attributes = classSymbol.GetAttributes();
-            
-            // 检查是否继承自 FantasyService（只生成服务注册）
-            var isServiceOnly = InheritsFromFantasyService(classSymbol);
             
             // 获取公共非静态方法
             var methods = classSymbol.GetMembers()
@@ -212,10 +201,7 @@ namespace ZAnalyzers.MinimalApiSG
                 a.AttributeClass?.Name?.EndsWith("AuthorizeAttribute", StringComparison.OrdinalIgnoreCase) == true).ToList();
 
             // 获取继承的接口并匹配名称
-            var interfaces = isServiceOnly 
-                ? classSymbol.AllInterfaces
-                    .FirstOrDefault(i => i.Name.StartsWith("I") && className.EndsWith(i.Name.Substring(1)))
-                :classSymbol.AllInterfaces
+            var interfaces = classSymbol.AllInterfaces
                     .FirstOrDefault(i => i.Name.StartsWith("I") && i.Name.Substring(1) == className);
 
             var interFacesNamespace = GetFullNamespace(interfaces?.ContainingNamespace);
@@ -230,22 +216,8 @@ namespace ZAnalyzers.MinimalApiSG
                 Tags = tags,
                 FilterAttributes = filterAttributes,
                 AuthorizeAttributes = authorizeAttributes,
-                Methods = methods,
-                IsServiceOnly = isServiceOnly
+                Methods = methods
             };
-        }
-
-        private static bool InheritsFromFantasyService(INamedTypeSymbol typeSymbol)
-        {
-            var baseType = typeSymbol.BaseType;
-            while (baseType != null)
-            {
-                if (baseType.Name == FantasyServiceBaseTypeName)
-                    return true;
-                baseType = baseType.BaseType;
-            }
-
-            return false;
         }
 
         private static bool InheritsFromZAnalyzers(INamedTypeSymbol typeSymbol)
@@ -253,7 +225,7 @@ namespace ZAnalyzers.MinimalApiSG
             var baseType = typeSymbol.BaseType;
             while (baseType != null)
             {
-                if (baseType.Name == FantasyApiBaseTypeName || baseType.Name == FantasyServiceBaseTypeName)
+                if (baseType.Name == ZAnalyzerApiBaseTypeName)
                     return true;
                 baseType = baseType.BaseType;
             }
@@ -287,7 +259,7 @@ namespace ZAnalyzers.MinimalApiSG
                 // 生成一个调试文件来查看是否有类被找到
                 var debugBuilder = new StringBuilder();
                 debugBuilder.AppendLine("// <auto-generated />");
-                debugBuilder.AppendLine("// Debug: No FantasyApi classes found");
+                debugBuilder.AppendLine("// Debug: No ZAnalyzerApi classes found");
                 debugBuilder.AppendLine($"// Total classes checked: {classes.Length}");
                 context.AddSource("FastExtensions.Debug.g.cs", SourceText.From(debugBuilder.ToString(), Encoding.UTF8));
                 return;
@@ -299,10 +271,7 @@ namespace ZAnalyzers.MinimalApiSG
             // 为每个类生成单独的扩展文件（只对非ServiceOnly类生成HTTP端点映射）
             foreach (var classInfo in classInfos)
             {
-                if (!classInfo.IsServiceOnly)
-                {
-                    GenerateIndividualExtensionFile(context, classInfo, compilation, context.CancellationToken);
-                }
+                GenerateIndividualExtensionFile(context, classInfo, compilation, context.CancellationToken);
             }
         }
 
@@ -326,7 +295,7 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("    /// <summary>");
             sourceBuilder.AppendLine("    /// ZAnalyzers.Core extension methods for dependency injection and API mapping");
             sourceBuilder.AppendLine("    /// </summary>");
-            sourceBuilder.AppendLine("    public static partial class FantasyExtensions");
+            sourceBuilder.AppendLine("    public static partial class ZAnalyzersExtensions");
             sourceBuilder.AppendLine("    {");
             sourceBuilder.AppendLine("        /// <summary>");
             sourceBuilder.AppendLine("        /// Register all ZAnalyzers.Core classes with the specified service lifetime");
@@ -335,7 +304,7 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("        /// <param name=\"lifetime\">The service lifetime (default: Scoped)</param>");
             sourceBuilder.AppendLine("        /// <returns>The service collection for chaining</returns>");
             sourceBuilder.AppendLine(
-                "        public static IServiceCollection WithFantasyLife(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Scoped)");
+                "        public static IServiceCollection WithZMinmalLife(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Scoped)");
             sourceBuilder.AppendLine("        {");
             sourceBuilder.AppendLine(diRegistration);
             sourceBuilder.AppendLine("            return services;");
@@ -346,9 +315,9 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("        /// </summary>");
             sourceBuilder.AppendLine("        /// <param name=\"webApplication\">The web application</param>");
             sourceBuilder.AppendLine("        /// <returns>The web application for chaining</returns>");
-            sourceBuilder.AppendLine("        public static WebApplication MapFantasyApis(this WebApplication webApplication)");
+            sourceBuilder.AppendLine("        public static WebApplication MapZMinimalApis(this WebApplication webApplication)");
             sourceBuilder.AppendLine("        {");
-            sourceBuilder.AppendLine("            return webApplication.MapFantasyApis(null);");
+            sourceBuilder.AppendLine("            return webApplication.MapZMinimalApis(null);");
             sourceBuilder.AppendLine("        }");
             sourceBuilder.AppendLine();
             sourceBuilder.AppendLine("        /// <summary>");
@@ -357,12 +326,12 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("        /// <param name=\"webApplication\">The web application</param>");
             sourceBuilder.AppendLine("        /// <param name=\"configureOptions\">Configuration action for ZAnalyzers.Core options</param>");
             sourceBuilder.AppendLine("        /// <returns>The web application for chaining</returns>");
-            sourceBuilder.AppendLine("        public static WebApplication MapFantasyApis(this WebApplication webApplication, System.Action<ZAnalyzers.Core.FantasyOption>? configureOptions)");
+            sourceBuilder.AppendLine("        public static WebApplication MapZMinimalApis(this WebApplication webApplication, System.Action<ZAnalyzers.Core.ZAnalyzerOption>? configureOptions)");
             sourceBuilder.AppendLine("        {");
-            sourceBuilder.AppendLine("            var options = new ZAnalyzers.Core.FantasyOption();");
+            sourceBuilder.AppendLine("            var options = new ZAnalyzers.Core.ZAnalyzerOption();");
             sourceBuilder.AppendLine("            configureOptions?.Invoke(options);");
             sourceBuilder.AppendLine();
-            foreach (var classInfo in classInfos.Where(c => !c.IsServiceOnly).OrderBy(c => c.Namespace).ThenBy(c => c.ClassName))
+            foreach (var classInfo in classInfos.OrderBy(c => c.Namespace).ThenBy(c => c.ClassName))
             {
                 var methodName = GenerateMapMethodName(classInfo.ClassName);
                 sourceBuilder.AppendLine($"            webApplication.Map{methodName}(options);");
@@ -373,7 +342,7 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("        /// <summary>");
             sourceBuilder.AppendLine("        /// Build the final route based on configuration options");
             sourceBuilder.AppendLine("        /// </summary>");
-            sourceBuilder.AppendLine("        private static string BuildFinalRoute(string baseRoute, string className, ZAnalyzers.Core.FantasyOption options)");
+            sourceBuilder.AppendLine("        private static string BuildFinalRoute(string baseRoute, string className, ZAnalyzers.Core.ZAnalyzerOption options)");
             sourceBuilder.AppendLine("        {");
             sourceBuilder.AppendLine("            if (options.DisableAutoMapRoute == true)");
             sourceBuilder.AppendLine("                return baseRoute;");
@@ -414,7 +383,7 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("}");
 
             // 添加主扩展文件
-            context.AddSource("FastExtensions.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+            context.AddSource("ZAnalyzerExtensions.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
         }
 
         private void GenerateIndividualExtensionFile(SourceProductionContext context, ClassInfo classInfo, 
@@ -422,7 +391,7 @@ namespace ZAnalyzers.MinimalApiSG
         {
             var methodName = GenerateMapMethodName(classInfo.ClassName);
             var instanceName = GenerateInstanceName(classInfo.ClassName);
-            var fileName = $"FastExtensions.{methodName}.g.cs";
+            var fileName = $"ZAnalyzerExtensions.{methodName}.g.cs";
 
             var sourceBuilder = new StringBuilder();
             sourceBuilder.AppendLine("// <auto-generated />");
@@ -446,7 +415,7 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("    /// <summary>");
             sourceBuilder.AppendLine($"    /// ZAnalyzers.Core extension methods for {classInfo.ClassName}");
             sourceBuilder.AppendLine("    /// </summary>");
-            sourceBuilder.AppendLine("    public static partial class FantasyExtensions");
+            sourceBuilder.AppendLine("    public static partial class ZAnalyzersExtensions");
             sourceBuilder.AppendLine("    {");
             sourceBuilder.AppendLine("        /// <summary>");
             sourceBuilder.AppendLine($"        /// Map {classInfo.ClassName} endpoints to the web application");
@@ -464,9 +433,9 @@ namespace ZAnalyzers.MinimalApiSG
             sourceBuilder.AppendLine("        /// <param name=\"webApplication\">The web application</param>");
             sourceBuilder.AppendLine("        /// <param name=\"options\">ZAnalyzers.Core configuration options</param>");
             sourceBuilder.AppendLine("        /// <returns>The web application for chaining</returns>");
-            sourceBuilder.AppendLine($"        public static WebApplication Map{methodName}(this WebApplication webApplication, ZAnalyzers.Core.FantasyOption? options)");
+            sourceBuilder.AppendLine($"        public static WebApplication Map{methodName}(this WebApplication webApplication, ZAnalyzers.Core.ZAnalyzerOption? options)");
             sourceBuilder.AppendLine("        {");
-            sourceBuilder.AppendLine("            options ??= new ZAnalyzers.Core.FantasyOption();");
+            sourceBuilder.AppendLine("            options ??= new ZAnalyzers.Core.ZAnalyzerOption();");
             
             sourceBuilder.AppendLine($"            var finalRoute = BuildFinalRoute(\"{classInfo.Route}\", \"{classInfo.ClassName}\", options);");
             sourceBuilder.AppendLine(
@@ -1131,7 +1100,6 @@ namespace ZAnalyzers.MinimalApiSG
             public List<AttributeData> AuthorizeAttributes { get; set; } = new();
             public List<AttributeData> FilterAttributes { get; set; } = new();
             public List<IMethodSymbol> Methods { get; set; } = new();
-            public bool IsServiceOnly { get; set; }
         }
     }
 }

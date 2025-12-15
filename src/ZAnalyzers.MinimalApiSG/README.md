@@ -6,7 +6,7 @@ ZAnalyzers.MinimalApiSG是一个代码生成器，用于简化ASP.NET Core Minim
 
 ## 核心功能
 
-- 自动发现继承自`FantasyApi`的服务类
+- 自动发现继承自`ZAnalyzerApi`的服务类
 - 根据命名约定自动推断HTTP方法和路由
 - 支持通过特性自定义路由
 - 自动注册服务到依赖注入容器
@@ -33,7 +33,7 @@ namespace YourNamespace
     [Route("/api/your-route")]
     // 可选：添加API标签
     [Tags("YourTag")]
-    public class YourService : FantasyApi
+    public class YourService : ZAnalyzerApi
     {
         // 会映射为 GET /api/your-route/items
         public async Task<IEnumerable<Item>> GetItems()
@@ -91,14 +91,14 @@ namespace YourNamespace
 var builder = WebApplication.CreateBuilder(args);
 
 // 注册服务到DI容器（默认为Scoped生命周期）
-builder.Services.WithFantasyLife();
+builder.Services.WithZMinmalLife();
 // 或指定生命周期
-// builder.Services.WithFantasyLife(ServiceLifetime.Singleton);
+// builder.Services.WithZMinmalLife(ServiceLifetime.Singleton);
 
 var app = builder.Build();
 
 // 注册所有API路由
-app.MapFantasyApi();
+app.MapZMinimalApis();
 
 app.Run();
 ```
@@ -166,7 +166,7 @@ public interface IYourService
     Task<Item> GetItem(int id);
 }
 
-public class YourService : FantasyApi, IYourService
+public class YourService : ZAnalyzerApi, IYourService
 {
     public Task<Item> GetItem(int id) { ... }
 }

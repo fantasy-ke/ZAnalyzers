@@ -23,7 +23,7 @@ public interface ITestService
 [Filter(typeof(TestFilter))]
 [TestAuthorize("Test.Page", "Test.Update")]
 //[Authorize(Roles = "Admin")]
-public class TestService: FantasyApi,  ITestService
+public class TestService: ZAnalyzerApi,  ITestService
 {
     [Authorize(Roles = "Admin")]
     public async Task<string> CreateAsync()

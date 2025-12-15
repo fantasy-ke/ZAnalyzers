@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using ZAnalyzers.Test;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,8 @@ builder.Services.AddAuthentication(options =>
     });
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.WithFantasyLife();
+builder.Services.WithZMinmalLife();
+builder.Services.AddZAnalyzerServices(); // 添加新的服务注入
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -61,7 +63,6 @@ app.MapGet("/weatherforecast", () =>
     })
     .WithName("GetWeatherForecast");
 
-app.MapFantasyApis();
 
 app.Run();
 
