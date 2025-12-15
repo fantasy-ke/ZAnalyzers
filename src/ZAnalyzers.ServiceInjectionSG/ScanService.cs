@@ -16,9 +16,9 @@ public static class ScanService
     {
         var visitedAssemblies = new HashSet<IAssemblySymbol>(SymbolEqualityComparer.Default);
 
-        _iScopeDependencySymbol ??= compilationContext.GetTypeByMetadataName("ZAnalyzers.Core.Dependencies.IScopeDependency");
-        _iSingletonDependencySymbol ??= compilationContext.GetTypeByMetadataName("ZAnalyzers.Core.Dependencies.ISingletonDependency");
-        _iTransientDependencySymbol ??= compilationContext.GetTypeByMetadataName("ZAnalyzers.Core.Dependencies.ITransientDependency");
+        _iScopeDependencySymbol ??= compilationContext.GetTypeByMetadataName("ZAnalyzers.Core.IScopeDependency");
+        _iSingletonDependencySymbol ??= compilationContext.GetTypeByMetadataName("ZAnalyzers.Core.ISingletonDependency");
+        _iTransientDependencySymbol ??= compilationContext.GetTypeByMetadataName("ZAnalyzers.Core.ITransientDependency");
 
         void ScanAssembly(IAssemblySymbol assemblySymbol)
         {
