@@ -1,4 +1,4 @@
-using ZAnalyzers.Core.Dependencies;
+using ZAnalyzers.Core;
 
 namespace ZAnalyzers.Test.Service;
 
