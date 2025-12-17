@@ -611,6 +611,8 @@ namespace ZAnalyzers.MinimalApiSG
 
         private static string GenerateAuthorizationCode(List<AttributeData> authorizeAttributes)
         {
+            if (!authorizeAttributes.Any()) return string.Empty;
+            
             // 获取 AuthorizeAttribute 的 Roles 属性
             var rolesArg = authorizeAttributes
                 .SelectMany(a => a.NamedArguments)

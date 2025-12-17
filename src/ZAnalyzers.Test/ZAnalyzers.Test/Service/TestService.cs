@@ -21,11 +21,9 @@ public interface ITestService
 [Core.Route("api/Test")]
 [Tags("Test")]
 [Filter(typeof(TestFilter))]
-[TestAuthorize("Test.Page", "Test.Update")]
 //[Authorize(Roles = "Admin")]
 public class TestService: ZAnalyzerApi,  ITestService
 {
-    [Authorize(Roles = "Admin")]
     public async Task<string> CreateAsync()
     {
         return await Task.FromResult("asd");
